@@ -14,7 +14,12 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-
   sql:
     init:
       mode: always
+
+application:
+    security:
+      jwt:
+        secret-key: ${JWT_SECRET_KEY}
+        expiration: ${JWT_EXPIRATION_TIME}
