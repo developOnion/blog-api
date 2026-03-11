@@ -3,6 +3,7 @@ package com.reaksmey.blog.service;
 import com.github.slugify.Slugify;
 import com.reaksmey.blog.dto.BlogRequest;
 import com.reaksmey.blog.dto.BlogResponse;
+import com.reaksmey.blog.exception.ResourceNotFoundException;
 import com.reaksmey.blog.mapper.BlogMapper;
 import com.reaksmey.blog.model.Blog;
 import com.reaksmey.blog.model.User;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -45,6 +48,7 @@ public class PostService {
 
 		String slug = slugify.slugify(blogRequest.title());
 		if (blogRepository.existsBySlug(slug)) {
+			log.info("Slug '{}' already exists, generating unique slug", slug);
 			slug += "-" + System.currentTimeMillis();
 		}
 
@@ -61,8 +65,20 @@ public class PostService {
 			.featuredImageUrl(blogRequest.featuredImageUrl())
 			.status(blogRequest.status())
 			.build();
+
 		Blog savedBlog = blogRepository.save(blog);
+		log.info("Blog post saved with id: {}", savedBlog.getId());
 
 		return blogMapper.toDto(savedBlog);
+	}
+
+	public BlogResponse getPostById(UUID id) {
+
+		log.info("Fetching blog post with id: {}", id);
+		Blog blog = blogRepository.findById(id)
+			.orElseThrow(() -> new ResourceNotFoundException("Blog post not found with id: " + id));
+		log.info("Blog post found: {}, {}", blog.getTitle(), blog.getSlug());
+
+		return blogMapper.toDto(blog);
 	}
 }

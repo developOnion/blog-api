@@ -6,6 +6,7 @@ import com.reaksmey.blog.security.UserPrincipal;
 import com.reaksmey.blog.service.PostService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/posts")
@@ -37,6 +40,15 @@ public class PostController {
 
 		Page<BlogResponse> posts = postService.getAllPosts(pageable);
 		return ResponseEntity.ok().body(posts);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<BlogResponse> getPostById(
+		@PathVariable UUID id
+	) {
+
+		BlogResponse post = postService.getPostById(id);
+		return ResponseEntity.ok().body(post);
 	}
 
 	@PostMapping

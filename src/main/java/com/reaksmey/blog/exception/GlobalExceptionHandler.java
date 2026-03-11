@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -145,6 +146,19 @@ public class GlobalExceptionHandler {
 		ErrorResponse errorResponse = createErrorResponse(
 			HttpStatus.BAD_REQUEST,
 			"Invalid property reference: " + ex.getMessage()
+		);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+		MethodArgumentTypeMismatchException ex
+	) {
+
+		ErrorResponse errorResponse = createErrorResponse(
+			HttpStatus.BAD_REQUEST,
+			"Invalid type for parameter: " + ex.getName()
 		);
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
