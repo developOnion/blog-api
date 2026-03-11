@@ -10,13 +10,7 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 
-public class UserPrincipal implements UserDetails, Principal {
-
-	private final User user;
-
-	public UserPrincipal(User user) {
-		this.user = user;
-	}
+public record UserPrincipal(User user) implements UserDetails, Principal {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

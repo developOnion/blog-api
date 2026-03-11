@@ -39,39 +39,5 @@ public class DataInitializer implements CommandLineRunner {
 
 			userRepository.save(admin);
 		}
-
-		Blog blog1 = new Blog(
-			"First Blog Post",
-			"first-blog-post",
-			"This is the content of the first blog post.",
-			"This is the excerpt of the first blog post.",
-			"Admin",
-			"",
-			BlogStatus.PUBLISHED
-		);
-
-		Blog blog2 = new Blog(
-			"Second Blog Post",
-			"second-blog-post",
-			"This is the content of the second blog post.",
-			"This is the excerpt of the second blog post.",
-			"Admin",
-			"",
-			BlogStatus.DRAFT
-		);
-
-		Blog blog3 = new Blog(
-			"Third Blog Post",
-			"third-blog-post",
-			"This is the content of the third blog post.",
-			"This is the excerpt of the third blog post.",
-			"Admin",
-			"",
-			BlogStatus.PUBLISHED
-		);
-
-		blogRepository.save(blog1);
-		blogRepository.save(blog2);
-		blogRepository.save(blog3);
 	}
 }

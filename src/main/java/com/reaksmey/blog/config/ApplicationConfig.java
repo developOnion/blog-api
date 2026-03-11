@@ -1,6 +1,7 @@
 package com.reaksmey.blog.config;
 
 
+import com.github.slugify.Slugify;
 import com.reaksmey.blog.security.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,5 +40,10 @@ public class ApplicationConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(12);
+	}
+
+	@Bean
+	public Slugify slugify() {
+		return Slugify.builder().build();
 	}
 }

@@ -1,9 +1,6 @@
 package com.reaksmey.blog.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -35,9 +32,9 @@ public class Blog extends BaseEntity {
 	@Column(length = 500)
 	private String excerpt;
 
-	@NotBlank
-	@Column(nullable = false)
-	private String author;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "author_id", nullable = false)
+	private User author;
 
 	private String featuredImageUrl;
 

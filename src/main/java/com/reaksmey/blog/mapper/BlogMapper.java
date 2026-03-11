@@ -14,7 +14,7 @@ public class BlogMapper {
 			blog.getSlug(),
 			blog.getContent(),
 			blog.getExcerpt(),
-			blog.getAuthor(),
+			blog.getAuthor().getId(),
 			blog.getFeaturedImageUrl(),
 			blog.getStatus().name()
 		);
