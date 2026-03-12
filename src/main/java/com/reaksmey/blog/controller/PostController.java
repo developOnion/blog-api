@@ -52,14 +52,13 @@ public class PostController {
 	}
 
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<BlogResponse> createPost(
 		@Valid @RequestBody BlogRequest blogRequest,
 		@AuthenticationPrincipal UserPrincipal currentUser
 	) {
 
 		BlogResponse createdPost = postService.createPost(blogRequest, currentUser.user());
-		return ResponseEntity.ok().body(createdPost);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
 	}
 
 	@PatchMapping("/{id}")
@@ -71,5 +70,16 @@ public class PostController {
 
 		BlogResponse updatedPost = postService.updatePost(id, blogRequest, currentUser.user());
 		return ResponseEntity.ok().body(updatedPost);
+	}
+
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public ResponseEntity<Void> deletePost(
+		@PathVariable UUID id,
+		@AuthenticationPrincipal UserPrincipal currentUser
+	) {
+
+		postService.deletePost(id, currentUser.user());
+		return ResponseEntity.noContent().build();
 	}
 }

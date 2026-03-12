@@ -21,10 +21,10 @@ import java.util.UUID;
 @Service
 public class PostService {
 
+	private static final int EXCERPT_LENGTH = 100;
 	private final BlogRepository blogRepository;
 	private final BlogMapper blogMapper;
 	private final SlugUtil slugUtil;
-	private static final int EXCERPT_LENGTH = 100;
 
 	public PostService(
 		BlogRepository blogRepository,
@@ -37,6 +37,7 @@ public class PostService {
 		this.slugUtil = slugUtil;
 	}
 
+	@Transactional(readOnly = true)
 	public Page<BlogResponse> getAllPosts(final Pageable pageable) {
 
 		log.info("Fetching all blog posts with pagination: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
@@ -112,5 +113,17 @@ public class PostService {
 		log.info("Blog post updated with id: {}", updatedBlog.getId());
 
 		return blogMapper.toDto(updatedBlog);
+	}
+
+	@Transactional
+	public void deletePost(UUID id, User user) {
+
+		log.info("Deleting blog post with id: {}", id);
+
+		final Blog blog = blogRepository.findByIdAndAuthor_Id(id, user.getId())
+			.orElseThrow(() -> new ResourceNotFoundException("Blog post not found with id: " + id));
+
+		blogRepository.delete(blog);
+		log.info("Blog post deleted with id: {}", id);
 	}
 }

@@ -36,7 +36,6 @@ public class AuthService {
 
 	public LoginResponse authenticate(LoginRequest loginRequest) {
 
-		log.info("Authenticating user: {}", loginRequest.username());
 		try {
 			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 				loginRequest.username(),
