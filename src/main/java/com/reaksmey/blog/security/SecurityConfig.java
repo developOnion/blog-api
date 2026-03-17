@@ -2,6 +2,7 @@ package com.reaksmey.blog.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,8 +44,10 @@ public class SecurityConfig {
 					"/auth/**",
 					"/v3/api-docs/**",
 					"/swagger-ui/**",
-					"/swagger-ui.html"
+					"/swagger-ui.html",
+					"/health"
 				).permitAll()
+				.requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
 				.anyRequest().authenticated()
 			)
 			.sessionManagement(

@@ -9,18 +9,23 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-	@Value("${application.security.jwt.secret-key}")
-	private String SECRET_KEY;
+	private final SecretKey signingKey;
+	private final Long EXPIRATION_TIME;
 
-	@Value("${application.security.jwt.expiration}")
-	private Long EXPIRATION_TIME;
+	public JwtService(
+		@Value("${application.security.jwt.secret-key}") String secretKey,
+		@Value("${application.security.jwt.expiration}") Long expirationTime
+	) {
+
+		this.signingKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+		this.EXPIRATION_TIME = expirationTime;
+	}
 
 	public String generateToken(String username) {
 
@@ -30,20 +35,14 @@ public class JwtService {
 			.issuedAt(new Date(System.currentTimeMillis()))
 			.expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 			.and()
-			.signWith(generateKey())
+			.signWith(signingKey)
 			.compact();
-	}
-
-	public Key generateKey() {
-
-		byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
-		return Keys.hmacShaKeyFor(keyBytes);
 	}
 
 	private Claims extractAllClaims(String token) {
 
 		return Jwts.parser()
-			.verifyWith((SecretKey) generateKey())
+			.verifyWith(signingKey)
 			.build()
 			.parseSignedClaims(token)
 			.getPayload();
