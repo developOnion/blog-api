@@ -1,6 +1,6 @@
 package com.reaksmey.blog.exception;
 
-import com.reaksmey.blog.dto.ErrorResponse;
+import com.reaksmey.blog.common.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.core.PropertyReferenceException;

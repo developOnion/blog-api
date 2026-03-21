@@ -1,10 +1,6 @@
-package com.reaksmey.blog.controller;
+package com.reaksmey.blog.blog;
 
-import com.reaksmey.blog.dto.BlogPatchRequest;
-import com.reaksmey.blog.dto.BlogRequest;
-import com.reaksmey.blog.dto.BlogResponse;
 import com.reaksmey.blog.auth.UserPrincipal;
-import com.reaksmey.blog.service.PostService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package com.reaksmey.blog.model;
+package com.reaksmey.blog.blog;
 
 public enum BlogStatus {
 	DRAFT,

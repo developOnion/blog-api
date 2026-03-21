@@ -1,4 +1,4 @@
-package com.reaksmey.blog.controller;
+package com.reaksmey.blog.util;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;

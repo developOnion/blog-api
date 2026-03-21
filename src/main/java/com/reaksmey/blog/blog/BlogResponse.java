@@ -1,4 +1,4 @@
-package com.reaksmey.blog.dto;
+package com.reaksmey.blog.blog;
 
 import java.util.UUID;
 

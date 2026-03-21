@@ -2,6 +2,7 @@ package com.reaksmey.blog.config;
 
 import com.reaksmey.blog.auth.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -18,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -26,14 +27,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
 	private final UserDetailsServiceImpl userDetailsService;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	public JwtFilter(
 		JwtService jwtService,
-		UserDetailsServiceImpl userDetailsService
+		UserDetailsServiceImpl userDetailsService,
+		JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
 	) {
 
 		this.jwtService = jwtService;
 		this.userDetailsService = userDetailsService;
+		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	}
 
 	@Override
@@ -43,22 +47,22 @@ public class JwtFilter extends OncePerRequestFilter {
 		@NonNull FilterChain filterChain
 	) throws ServletException, IOException {
 
-		final String path = request.getServletPath();
-		log.info("Incoming request to {}", path);
-
-		if (path.startsWith("/auth")
-			|| path.startsWith("/v3/api-docs")
-			|| path.startsWith("/swagger-ui")
-			|| path.equals("/swagger-ui.html")
-		) {
-			log.info("Request to {} - skipping JWT filter", request.getServletPath());
-			log.info("Skipping JWT filter for auth endpoint");
-			filterChain.doFilter(request, response);
-			return;
-		}
+//		final String path = request.getServletPath();
+//		log.info("Incoming request to {}", path);
+//
+//		if (path.startsWith("/auth")
+//			|| path.startsWith("/v3/api-docs")
+//			|| path.startsWith("/swagger-ui")
+//			|| path.equals("/swagger-ui.html")
+//		) {
+//			log.info("Request to {} - skipping JWT filter", request.getServletPath());
+//			log.info("Skipping JWT filter for auth endpoint");
+//			filterChain.doFilter(request, response);
+//			return;
+//		}
 
 		final String authHeader = request.getHeader("Authorization");
-		final String token;
+		final String refreshToken;
 		final String username;
 
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -68,14 +72,14 @@ public class JwtFilter extends OncePerRequestFilter {
 		}
 
 		try {
-			token = authHeader.substring(7);
-			username = jwtService.extractUsername(token);
+			refreshToken = authHeader.substring(7);
+			username = jwtService.extractUsername(refreshToken);
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
 				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-				if (jwtService.isValidToken(token, userDetails)) {
+				if (jwtService.isValidToken(refreshToken, userDetails)) {
 
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 						userDetails,
@@ -88,26 +92,20 @@ public class JwtFilter extends OncePerRequestFilter {
 			}
 
 			filterChain.doFilter(request, response);
-		} catch (SignatureException e) {
-			handleJwtException(response, "Invalid JWT signature");
-		} catch (ExpiredJwtException e) {
-			handleJwtException(response, "JWT token has expired");
-		} catch (MalformedJwtException e) {
-			handleJwtException(response, "Invalid JWT token");
+		} catch (JwtException e) {
+			SecurityContextHolder.clearContext();
+			String clientMessage = mapExceptionToClientMessage(e);
+			log.debug("JWT error: {}", e.getMessage());
+			jwtAuthenticationEntryPoint.commence(request, response, new AuthenticationException(clientMessage) {});
 		}
 	}
 
-	private void handleJwtException(
-		HttpServletResponse response,
-		String message
-	) throws IOException {
-
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		response.setContentType("application/json");
-		response.getWriter().write(
-			"{\"timestamp\":\"" + LocalDateTime.now() + "\"," +
-				"\"status\":401," +
-				"\"message\":\"" + message + "\"}"
-		);
+	private String mapExceptionToClientMessage(JwtException e) {
+		return switch (e) {
+			case ExpiredJwtException expiredJwtException -> "JWT expired";
+			case SignatureException signatureException -> "Invalid JWT signature";
+			case MalformedJwtException malformedJwtException -> "Malformed JWT";
+			case null, default -> "Invalid token";
+		};
 	}
 }

@@ -1,7 +1,7 @@
 package com.reaksmey.blog.auth;
 
-import com.reaksmey.blog.model.User;
-import com.reaksmey.blog.repository.UserRepository;
+import com.reaksmey.blog.user.User;
+import com.reaksmey.blog.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

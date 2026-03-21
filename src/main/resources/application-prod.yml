@@ -25,6 +25,12 @@ spring:
       ADMIN_USERNAME: ${PROD_ADMIN_USERNAME}
       ADMIN_PASSWORD_HASH: ${PROD_ADMIN_PASSWORD_HASH}
 
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 logging:
   level:
     root: error

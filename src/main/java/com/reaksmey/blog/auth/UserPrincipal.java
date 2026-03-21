@@ -1,6 +1,6 @@
 package com.reaksmey.blog.auth;
 
-import com.reaksmey.blog.model.User;
+import com.reaksmey.blog.user.User;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

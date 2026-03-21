@@ -1,13 +1,7 @@
-package com.reaksmey.blog.service;
+package com.reaksmey.blog.blog;
 
-import com.reaksmey.blog.dto.BlogPatchRequest;
-import com.reaksmey.blog.dto.BlogRequest;
-import com.reaksmey.blog.dto.BlogResponse;
 import com.reaksmey.blog.exception.ResourceNotFoundException;
-import com.reaksmey.blog.mapper.BlogMapper;
-import com.reaksmey.blog.model.Blog;
-import com.reaksmey.blog.model.User;
-import com.reaksmey.blog.repository.BlogRepository;
+import com.reaksmey.blog.user.User;
 import com.reaksmey.blog.util.SlugUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

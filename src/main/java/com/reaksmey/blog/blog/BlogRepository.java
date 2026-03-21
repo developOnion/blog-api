@@ -1,6 +1,5 @@
-package com.reaksmey.blog.repository;
+package com.reaksmey.blog.blog;
 
-import com.reaksmey.blog.model.Blog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

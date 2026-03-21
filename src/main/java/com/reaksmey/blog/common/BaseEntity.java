@@ -1,4 +1,4 @@
-package com.reaksmey.blog.model;
+package com.reaksmey.blog.common;
 
 import jakarta.persistence.*;
 import lombok.*;

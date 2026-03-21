@@ -1,7 +1,5 @@
-package com.reaksmey.blog.mapper;
+package com.reaksmey.blog.blog;
 
-import com.reaksmey.blog.dto.BlogResponse;
-import com.reaksmey.blog.model.Blog;
 import org.springframework.stereotype.Component;
 
 @Component

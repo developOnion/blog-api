@@ -1,7 +1,7 @@
 package com.reaksmey.blog.util;
 
 import com.github.slugify.Slugify;
-import com.reaksmey.blog.repository.BlogRepository;
+import com.reaksmey.blog.blog.BlogRepository;
 import org.springframework.stereotype.Component;
 
 @Component

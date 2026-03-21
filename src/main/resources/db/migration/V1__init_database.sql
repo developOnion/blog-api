@@ -36,4 +36,4 @@ CREATE TABLE IF NOT EXISTS blogs
 );
 
 ALTER TABLE blogs
-    ADD CONSTRAINT fkt8g0udj2fq40771g38t2t011n FOREIGN KEY (author_id) REFERENCES users (id);
+    ADD CONSTRAINT fk_blogs_users FOREIGN KEY (author_id) REFERENCES users (id);

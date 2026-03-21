@@ -1,6 +1,5 @@
-package com.reaksmey.blog.dto;
+package com.reaksmey.blog.blog;
 
-import com.reaksmey.blog.model.BlogStatus;
 import jakarta.validation.constraints.Size;
 
 public record BlogPatchRequest(

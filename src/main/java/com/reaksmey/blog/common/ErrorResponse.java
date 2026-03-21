@@ -1,4 +1,4 @@
-package com.reaksmey.blog.dto;
+package com.reaksmey.blog.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

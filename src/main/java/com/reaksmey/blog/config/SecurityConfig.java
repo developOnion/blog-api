@@ -21,14 +21,17 @@ public class SecurityConfig {
 
 	private final JwtFilter jwtFilter;
 	private final AuthenticationProvider authenticationProvider;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	public SecurityConfig(
 		JwtFilter jwtFilter,
-		AuthenticationProvider authenticationProvider
+		AuthenticationProvider authenticationProvider,
+		JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
 	) {
 
 		this.jwtFilter = jwtFilter;
 		this.authenticationProvider = authenticationProvider;
+		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	}
 
 	@Bean
@@ -54,6 +57,7 @@ public class SecurityConfig {
 				session -> session
 					.sessionCreationPolicy(STATELESS)
 			)
+			.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 			.authenticationProvider(authenticationProvider)
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 			.build();

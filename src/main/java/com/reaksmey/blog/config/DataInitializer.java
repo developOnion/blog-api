@@ -1,7 +1,7 @@
 package com.reaksmey.blog.config;
 
-import com.reaksmey.blog.model.User;
-import com.reaksmey.blog.repository.UserRepository;
+import com.reaksmey.blog.user.User;
+import com.reaksmey.blog.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
