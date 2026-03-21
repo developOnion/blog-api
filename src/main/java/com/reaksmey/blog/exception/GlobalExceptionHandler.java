@@ -1,17 +1,23 @@
 package com.reaksmey.blog.exception;
 
-import com.reaksmey.blog.dto.ErrorResponse;
+import com.reaksmey.blog.common.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -40,6 +46,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
 		ResourceNotFoundException ex
 	) {
+		log.error("Resource not found: {}", ex.getMessage(), ex);
 
 		ErrorResponse errorResponse = createErrorResponse(
 			HttpStatus.NOT_FOUND,
@@ -53,6 +60,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleResourceAlreadyExistsException(
 		ResourceAlreadyExistsException ex
 	) {
+		log.error("Conflict error: {}", ex.getMessage(), ex);
 
 		ErrorResponse errorResponse = createErrorResponse(
 			HttpStatus.CONFLICT,
@@ -66,6 +74,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleAuthenticationException(
 		AuthenticationException ex
 	) {
+		log.error("Authentication error: {}", ex.getMessage(), ex);
 
 		ErrorResponse errorResponse = createErrorResponse(
 			HttpStatus.UNAUTHORIZED,
@@ -79,6 +88,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleSpringAuthenticationException(
 		org.springframework.security.core.AuthenticationException ex
 	) {
+		log.error("Handling Spring Security AuthenticationException: {}", ex.getMessage());
 
 		ErrorResponse errorResponse = createErrorResponse(
 			HttpStatus.UNAUTHORIZED,
@@ -92,6 +102,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
 		MethodArgumentNotValidException ex
 	) {
+		log.error("Validation error: {}", ex.getMessage(), ex);
 
 		Map<String, String> validationErrors = new HashMap<>();
 
@@ -118,6 +129,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleConstraintViolationException(
 		jakarta.validation.ConstraintViolationException ex
 	) {
+		log.info("Handling ConstraintViolationException: {}", ex.getMessage());
 
 		Map<String, String> errors = new HashMap<>();
 
@@ -134,5 +146,73 @@ public class GlobalExceptionHandler {
 		);
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	}
+
+	@ExceptionHandler(PropertyReferenceException.class)
+	public ResponseEntity<ErrorResponse> handlePropertyReferenceException(
+		PropertyReferenceException ex
+	) {
+		log.error("Invalid property reference: {}", ex.getPropertyName(), ex);
+
+		ErrorResponse errorResponse = createErrorResponse(
+			HttpStatus.BAD_REQUEST,
+			"Invalid property reference: " + ex.getMessage()
+		);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+		MethodArgumentTypeMismatchException ex
+	) {
+		log.error("Type mismatch for parameter: {}", ex.getName(), ex);
+
+		ErrorResponse errorResponse = createErrorResponse(
+			HttpStatus.BAD_REQUEST,
+			"Invalid type for parameter: " + ex.getName()
+		);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+		HttpMessageNotReadableException ex
+	) {
+		log.error("Malformed JSON request", ex);
+
+		ErrorResponse errorResponse = createErrorResponse(
+			HttpStatus.BAD_REQUEST,
+			"Malformed JSON request: " + ex.getMessage()
+		);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	}
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ResponseEntity<ErrorResponse> handleNoResourceFoundException(
+		NoResourceFoundException ex
+	) {
+
+		log.error("No resource found for request: {}", ex.getResourcePath(), ex);
+
+		ErrorResponse errorResponse = createErrorResponse(
+			HttpStatus.NOT_FOUND,
+			"No resource found for path: " + ex.getResourcePath()
+		);
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+
+		log.error("Unexpected error", ex);
+		ErrorResponse errorResponse = createErrorResponse(
+			HttpStatus.INTERNAL_SERVER_ERROR,
+			"An unexpected error occurred"
+		);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 	}
 }

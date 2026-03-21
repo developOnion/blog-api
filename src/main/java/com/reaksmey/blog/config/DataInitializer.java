@@ -1,18 +1,31 @@
 package com.reaksmey.blog.config;
 
-import com.reaksmey.blog.model.user.User;
-import com.reaksmey.blog.repository.UserRepository;
+import com.reaksmey.blog.user.User;
+import com.reaksmey.blog.user.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Profile("dev")
 @Component
 public class DataInitializer implements CommandLineRunner {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public DataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	@Value("${app.seed.admin.username}")
+	private String seedUsername;
+
+	@Value("${app.seed.admin.password}")
+	private String seedPassword;
+
+	public DataInitializer(
+		UserRepository userRepository,
+		PasswordEncoder passwordEncoder
+	) {
+
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
@@ -20,14 +33,15 @@ public class DataInitializer implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		if (userRepository.findByUsername("admin").isEmpty()) {
+		if (seedPassword == null || seedPassword.isEmpty()) {
+			return;
+		}
 
-			User admin = new User(
-				"admin",
-				passwordEncoder.encode("admin123")
-			);
-
-			userRepository.save(admin);
+		if (userRepository.findByUsername(seedUsername).isEmpty()) {
+			userRepository.save(new User(
+				seedUsername,
+				passwordEncoder.encode(seedPassword)
+			));
 		}
 	}
 }
