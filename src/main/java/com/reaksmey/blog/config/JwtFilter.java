@@ -80,6 +80,10 @@ public class JwtFilter extends OncePerRequestFilter {
 					);
 					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authToken);
+				} else {
+					log.debug("Token is invalid or revoked for user: {}", username);
+					jwtAuthenticationEntryPoint.commence(request, response, new AuthenticationException("Token is invalid or has been revoked") {});
+					return;
 				}
 			}
 
