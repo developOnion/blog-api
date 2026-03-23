@@ -1,0 +1,52 @@
+package com.reaksmey.blog.config;
+
+import com.reaksmey.blog.token.TokenRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class LogoutService implements LogoutHandler {
+
+	private final TokenRepository tokenRepository;
+
+	@Override
+	public void logout(
+		HttpServletRequest request,
+		HttpServletResponse response,
+		Authentication authentication
+	) {
+		final String authHeader = request.getHeader("Authorization");
+		final String jwt;
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return;
+		}
+		jwt = authHeader.substring(7);
+		var storedToken = tokenRepository.findByToken(jwt)
+			.orElse(null);
+		if (storedToken != null) {
+			storedToken.setExpired(true);
+			storedToken.setRevoked(true);
+			tokenRepository.save(storedToken);
+
+			// Clear refresh token cookie
+			ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+				.httpOnly(true)
+				.secure(false)
+				.path("/")
+				.maxAge(0)
+				.sameSite("Lax")
+				.build();
+			response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+			SecurityContextHolder.clearContext();
+		}
+	}
+}
