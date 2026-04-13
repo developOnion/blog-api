@@ -14,6 +14,27 @@ services:
       - onion-blog
     restart: unless-stopped
 
+  api:
+    build: .
+    container_name: blog-api
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_URL=jdbc:postgresql://postgres:5432/${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_EXPIRATION_TIME=${JWT_EXPIRATION_TIME}
+      - JWT_REFRESH_EXPIRATION_TIME=${JWT_REFRESH_EXPIRATION_TIME}
+      - PROD_ADMIN_USERNAME=${PROD_ADMIN_USERNAME}
+      - PROD_ADMIN_PASSWORD_HASH=${PROD_ADMIN_PASSWORD_HASH}
+    depends_on:
+      - postgres
+    networks:
+      - onion-blog
+    restart: always
+
 networks:
   onion-blog:
     driver: bridge

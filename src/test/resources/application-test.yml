@@ -5,6 +5,7 @@ spring:
     username: sa
     password:
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
     show-sql: false
@@ -16,6 +17,8 @@ application:
     jwt:
       secret-key: this-is-a-test-only-jwt-secret-key-with-at-least-32-bytes
       expiration: 3600000
+      refresh-token:
+        expiration: 86400000
 
 app:
   seed:

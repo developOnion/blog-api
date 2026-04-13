@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleAuthenticationException(
 		AuthenticationException ex
 	) {
-		log.error("Authentication error: {}", ex.getMessage(), ex);
+		log.warn("Authentication failure: {}", ex.getMessage());
 
 		ErrorResponse errorResponse = createErrorResponse(
 			HttpStatus.UNAUTHORIZED,
@@ -88,7 +88,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleTooManyRequestsException(
 		TooManyRequestsException ex
 	) {
-		log.error("Too many requests: {}", ex.getMessage(), ex);
+		log.warn("Rate limit exceeded: {}", ex.getMessage());
 
 		ErrorResponse errorResponse = createErrorResponse(
 			HttpStatus.TOO_MANY_REQUESTS,

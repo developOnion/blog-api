@@ -17,12 +17,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import com.reaksmey.blog.token.Token;
@@ -31,7 +33,10 @@ import com.reaksmey.blog.token.TokenType;
 
 @Slf4j
 @Service
+@Transactional
 public class AuthService {
+
+	private static final int REFRESH_GRACE_PERIOD_SECONDS = 10;
 
 	private final UserRepository userRepository;
 	private final AuthenticationManager authManager;
@@ -156,17 +161,28 @@ public class AuthService {
 			if (username != null) {
 
 				UserPrincipal userPrincipal = new UserPrincipal(
-					userRepository.findByUsername(username)
+					userRepository.findByUsernameWithLock(username)
 						.orElseThrow(() -> new ResourceNotFoundException("User does not exists"))
 				);
 
 				if (jwtService.isValidToken(refreshToken, userPrincipal)) {
-					var accessToken = jwtService.generateToken(userPrincipal);
-					
-					// Revoke old tokens and save new access token
 					User user = userPrincipal.user();
-					revokeAllUserTokens(user);
-					saveUserToken(user, accessToken);
+
+					// Check if user already has a valid token created within the grace period
+					var validTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+					var recentToken = validTokens.stream()
+						.filter(t -> t.getCreatedAt() != null &&
+							t.getCreatedAt().isAfter(LocalDateTime.now().minusSeconds(REFRESH_GRACE_PERIOD_SECONDS)))
+						.findFirst();
+					String accessToken;
+					if (recentToken.isPresent()) {
+						log.debug("Returning recent valid token for user: {}", username);
+						accessToken = recentToken.get().getToken();
+					} else {
+						accessToken = jwtService.generateToken(userPrincipal);
+						revokeAllUserTokens(user);
+						saveUserToken(user, accessToken);
+					}
 
 					var authResponse = new AuthResponse(accessToken);
 
