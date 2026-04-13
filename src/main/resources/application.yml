@@ -1,7 +1,10 @@
 server:
   servlet:
     context-path: /api/v1/
+
 spring:
+  application:
+    name: blog-api
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -17,6 +20,7 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+
 management:
   endpoint:
     health:
