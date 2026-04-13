@@ -2,8 +2,6 @@ server:
   servlet:
     context-path: /api/v1/
 spring:
-  profiles:
-    active: dev
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -26,4 +24,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: '*'
+  info:
+    env:
+      enabled: true

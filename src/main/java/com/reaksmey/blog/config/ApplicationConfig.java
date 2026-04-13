@@ -1,7 +1,5 @@
 package com.reaksmey.blog.config;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.slugify.Slugify;
 import com.reaksmey.blog.auth.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;

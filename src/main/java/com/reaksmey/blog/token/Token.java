@@ -1,25 +1,22 @@
 package com.reaksmey.blog.token;
 
+import com.reaksmey.blog.common.BaseEntity;
 import com.reaksmey.blog.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "tokens")
-public class Token {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	public UUID id;
+public class Token extends BaseEntity {
 
 	@Column(unique = true)
 	public String token;

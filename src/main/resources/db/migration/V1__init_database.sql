@@ -41,6 +41,9 @@ ALTER TABLE blogs
 CREATE TABLE IF NOT EXISTS tokens
 (
     id         uuid         NOT NULL,
+    created_at timestamp(6) NOT NULL,
+    updated_at timestamp(6) NULL,
+    "version"  int8         NULL,
     token      varchar(255) NOT NULL,
     token_type varchar(255) NOT NULL,
     revoked    boolean      NOT NULL,
